@@ -39,23 +39,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#d2e4e2] flex items-center justify-center px-4 relative overflow-hidden">
       
       {/* 1. Background Decor (Consistent with Home Page) */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-50 blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-50 blur-[120px]" />
       </div>
-
       <div className="w-full max-w-md">
-        {/* Logo / Brand Return Link */}
+        {/* Logo Section */}
         <Link href="/" className="flex items-center gap-2 justify-center mb-8 group">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform">
-            <Zap size={22} fill="currentColor" />
-          </div>
-          <span className="text-2xl font-black tracking-tighter text-slate-900 italic">
-            URL<span className="text-blue-600">GEN</span>
-          </span>
+          
         </Link>
 
         {/* Login Card */}
@@ -124,9 +118,9 @@ export default function LoginPage() {
 
           <div className="mt-8 pt-8 border-t border-slate-50 text-center">
             <p className="text-slate-500 font-medium">
-              New to URLGen?{" "}
+              Don't have an account?{" "}
               <Link href="/register" className="text-blue-600 font-bold hover:underline">
-                Create an account
+                "Create an account"
               </Link>
             </p>
           </div>

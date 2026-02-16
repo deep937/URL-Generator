@@ -4,13 +4,23 @@ import { useState } from "react";
 import supabase from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, Mail, Lock, Loader2, Sparkles, Zap, ArrowRight } from "lucide-react";
+import { 
+  User, 
+  Mail, 
+  Lock, 
+  Loader2, 
+  Sparkles, 
+  ArrowRight, 
+  Eye, 
+  EyeOff 
+} from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Eye toggle state
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: "", msg: "" });
 
@@ -22,7 +32,7 @@ export default function RegisterPage() {
     const { error } = await supabase.from("app_users").insert({
       name,
       email,
-      password, // Note: In a real app, ensure you use Supabase Auth for hashing!
+      password, 
     });
 
     setLoading(false);
@@ -36,7 +46,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#d2e4e2] flex items-center justify-center px-4 relative overflow-hidden">
       
       {/* Mesh Background Decor */}
       <div className="absolute inset-0 -z-10">
@@ -46,20 +56,15 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-md">
         {/* Logo Section */}
-        <Link href="/" className="flex items-center gap-2 justify-center mb-8 group">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform">
-            <Zap size={22} fill="currentColor" />
-          </div>
-          <span className="text-2xl font-black tracking-tighter text-slate-900 italic">
-            URL<span className="text-blue-600">GEN</span>
-          </span>
+        <Link href="/" className="flex flex-col items-center mb-8 group select-none">
+        
         </Link>
 
         {/* Card */}
         <div className="bg-white/80 backdrop-blur-2xl border border-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 p-8 md:p-10">
           <div className="text-center mb-8 space-y-2">
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Join the Elite</h1>
-            <p className="text-slate-500 font-medium">Start managing your links like a pro</p>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Create Your Account</h1>
+            <p className="text-sm text-slate-500 font-medium">Join the intelligence engine today.</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-5">
@@ -103,19 +108,26 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Password */}
+            {/* Password with Eye Toggle */}
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Password</label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-4 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none text-slate-900 font-medium"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-12 py-4 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none text-slate-900 font-medium"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
@@ -135,9 +147,9 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-8 pt-6 border-t border-slate-50 text-center">
-            <p className="text-slate-500 font-medium">
+            <p className="text-slate-500 font-medium text-sm">
               Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 font-bold hover:underline flex items-center justify-center gap-1 mt-1">
+              <Link href="/login" className="text-blue-600 font-bold hover:underline inline-flex items-center gap-1 ml-1">
                 Log in here <ArrowRight size={14} />
               </Link>
             </p>

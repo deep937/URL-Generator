@@ -5,8 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import supabase from "@/lib/supabase/client";
 import { QRCodeCanvas } from "qrcode.react";
 import { 
-  ArrowLeft, Globe, MousePointer2, 
-  Calendar, Zap, Copy, Check, Trash2, QrCode, Download
+  ArrowLeft, MousePointer2, 
+  Calendar, Zap, Copy, Check, Trash2, QrCode, Download, Clock
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -90,9 +90,9 @@ export default function LinkDetails() {
       <div className="flex justify-between items-center">
         <button 
           onClick={() => router.push("/dashboard")}
-          className="flex items-center gap-2 text-[12px] font-black text-green-800 uppercase tracking-[0.3em] hover:text-blue-600 transition-all"
+          className="flex items-center gap-2 text-[12px] font-black text-slate-900 uppercase tracking-[0.3em] hover:text-blue-600 transition-all"
         >
-          <ArrowLeft size={32} /> Back to Dashboard
+          <ArrowLeft size={24} /> Back to Dashboard
         </button>
 
         <button 
@@ -103,17 +103,18 @@ export default function LinkDetails() {
         </button>
       </div>
 
+      {/* STATS GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-gray-300 p-10 rounded-[3rem] border border-slate-100 shadow-sm space-y-6 flex flex-col justify-center">
+        <div className="lg:col-span-2 bg-slate-100 p-10 rounded-[3.5rem] border border-slate-200 shadow-sm space-y-6 flex flex-col justify-center">
           <div className="space-y-2">
-            <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Destination URL</span>
-            <h2 className="text-2xl font-bold text-slate-800 break-all">{item.long_url}</h2>
+            <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Destination URL</span>
+            <h2 className="text-2xl font-bold text-slate-800 break-all leading-tight">{item.long_url}</h2>
           </div>
           
           {item.short_url && (
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+            <div className="p-4 bg-white rounded-2xl border border-slate-200 flex items-center justify-between">
               <span className="font-mono text-sm text-blue-600 font-bold">
-                {window.location.host}/r/{item.short_url}
+                {typeof window !== 'undefined' ? window.location.host : ''}/r/{item.short_url}
               </span>
               <button onClick={copyLink} className="text-slate-400 hover:text-blue-600 transition-colors">
                 {copied ? <Check size={20} className="text-emerald-500" /> : <Copy size={20} />}
@@ -122,19 +123,44 @@ export default function LinkDetails() {
           )}
         </div>
 
-        <div className="bg-yellow-400 p-10 rounded-[3rem] text-white flex flex-col justify-center items-center text-center shadow-xl shadow-yellow-200/50">
+        <div className="bg-amber-400 p-10 rounded-[3.5rem] text-white flex flex-col justify-center items-center text-center shadow-xl shadow-amber-200/50">
           <MousePointer2 size={32} className="mb-4 opacity-50" />
           <p className="text-[10px] font-black uppercase tracking-widest opacity-80">Total Link Clicks</p>
           <h3 className="text-7xl font-black tracking-tighter">{item.clicks || 0}</h3>
         </div>
       </div>
 
+      {/* ADDED: GENERATION DATE AND TIME ROW */}
+      <div className="flex flex-wrap gap-4 items-center px-4">
+        <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
+          <Calendar size={16} className="text-blue-500" />
+          <div className="flex flex-col">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Created Date</span>
+            <span className="text-xs font-bold text-slate-700">
+              {new Date(item.created_at).toLocaleDateString('en-US', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+              })}
+            </span>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
+          <Clock size={16} className="text-emerald-500" />
+          <div className="flex flex-col">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Generation Time</span>
+            <span className="text-xs font-bold text-slate-700">
+              {new Date(item.created_at).toLocaleTimeString('en-US', { 
+                hour: '2-digit', minute: '2-digit' 
+              })}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* GRAPH ROW - CONDITIONAL QR DISPLAY */}
       <div className="flex flex-col lg:flex-row gap-8">
-        
-        {/* Only show QR if it's NOT a short link asset */}
         {!item.short_url && (
-          <div className="w-full lg:w-80 bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-6 shrink-0">
+          <div className="w-full lg:w-80 bg-white p-8 rounded-[3.5rem] border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-6 shrink-0">
             <div className="text-center">
               <QrCode size={20} className="mx-auto text-blue-600 mb-1" />
               <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">QR Asset</h3>
@@ -154,8 +180,7 @@ export default function LinkDetails() {
           </div>
         )}
 
-        {/* GRAPH - EXPANDS IF QR IS HIDDEN */}
-        <div className={`flex-1 bg-slate-300 p-10 rounded-[3rem] border border-slate-100 shadow-sm`}>
+        <div className={`flex-1 bg-white p-10 rounded-[3.5rem] border border-slate-100 shadow-sm`}>
           <div className="mb-8 flex items-center gap-3">
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
             <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Active Usage Graph</h3>

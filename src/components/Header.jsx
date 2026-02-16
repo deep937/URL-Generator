@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation"; // Added usePathname
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
   User, 
@@ -15,12 +15,17 @@ import {
 
 export default function Header() {
   const router = useRouter();
-  const pathname = usePathname(); // Initialize pathname
+  const pathname = usePathname(); 
   const [user, setUser] = useState(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
-  // Sync user state on mount AND whenever the path changes
+  // --- ADDED: Hide Header on Login and Register pages ---
+  const noHeaderPages = ["/login", "/register"];
+  if (noHeaderPages.includes(pathname)) {
+    return null; 
+  }
+
   useEffect(() => {
     const checkUser = () => {
       const storedUser = localStorage.getItem("user");
@@ -41,11 +46,11 @@ export default function Header() {
 
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [pathname]); // Added pathname here to trigger re-check on navigation
+  }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    setUser(null); // Clear local state immediately
+    setUser(null);
     window.location.href = "/login";
   };
 
@@ -62,15 +67,15 @@ export default function Header() {
         </div>
 
         {/* 2. CENTER: BRANDING */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center select-none cursor-default">
+        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center select-none cursor-default text-center">
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-black tracking-tighter text-slate-900 italic uppercase text-nowrap">
+            <span className="text-2xl font-black tracking-tighter text-slate-900 italic uppercase whitespace-nowrap">
               URL <span className="bg-linear-to-r from-blue-600 via-violet-500 to-emerald-500 bg-clip-text text-transparent">Generator</span>
             </span>
           </div>
           <div className="flex items-center gap-1.5 -mt-1">
             <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-            <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.4em] text-nowrap">
+            <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.4em] whitespace-nowrap">
               & QR Code Engine
             </span>
           </div>
@@ -93,7 +98,6 @@ export default function Header() {
                 <ChevronDown size={12} className={`text-slate-300 mr-1 transition-transform duration-300 ${isProfileOpen ? "rotate-180" : ""}`} />
               </button>
 
-              {/* PROFILE DROPDOWN */}
               {isProfileOpen && (
                 <div className="absolute top-14 right-0 w-72 bg-white rounded-3xl border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden animate-in fade-in zoom-in duration-200">
                   <div className="h-20 bg-slate-50 border-b border-slate-100 flex items-center px-6">
