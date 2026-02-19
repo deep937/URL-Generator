@@ -80,7 +80,7 @@ export default function GeneratePage() {
 
   return (
     // Changed bg color to ensure text contrast and fixed scrolling for long results
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-20 relative overflow-y-auto">
+    <div className="min-h-screen bg-[#abc7df] flex flex-col items-center justify-center px-4 py-20 relative overflow-y-auto">
       
       {/* Background Decor */}
       <div className="fixed inset-0 -z-10">
