@@ -75,7 +75,7 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#abc7df] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
       
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-linear-to-br from-blue-100 to-transparent blur-[120px] animate-pulse" />

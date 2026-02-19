@@ -65,7 +65,7 @@ export default function QRPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#abc7df] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
       
       {/* --- NEW: TOP NAVIGATION BAR --- */}
       <div className="absolute top-8 left-8 right-8 flex justify-between items-center pointer-events-none">

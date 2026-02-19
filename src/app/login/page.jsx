@@ -4,7 +4,8 @@ import { useState } from "react";
 import supabase from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Loader2, ArrowRight, Zap } from "lucide-react";
+// Added Eye and EyeOff icons
+import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,13 +13,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  // New state for toggling visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
 
-    // Note: In production, use supabase.auth.signInWithPassword for security
     const { data, error } = await supabase
       .from("app_users")
       .select("*")
@@ -41,18 +43,12 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#d2e4e2] flex items-center justify-center px-4 relative overflow-hidden">
       
-      {/* 1. Background Decor (Consistent with Home Page) */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-50 blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-50 blur-[120px]" />
       </div>
+      
       <div className="w-full max-w-md">
-        {/* Logo Section */}
-        <Link href="/" className="flex items-center gap-2 justify-center mb-8 group">
-          
-        </Link>
-
-        {/* Login Card */}
         <div className="bg-white/80 backdrop-blur-xl border border-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 p-8 md:p-10">
           <div className="text-center mb-8 space-y-2">
             <h1 className="text-3xl font-black text-slate-900 tracking-tight">Welcome Back</h1>
@@ -90,14 +86,29 @@ export default function LoginPage() {
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"} // Dynamic type
                   placeholder="••••••••"
-                  className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl pl-12 pr-4 py-4 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none text-slate-900 font-medium"
+                  className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl pl-12 pr-12 py-4 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none text-slate-900 font-medium"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+
+                {/* Eye Toggle Button */}
+                <button
+                  type="button" // Critical to prevent form submission
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -120,7 +131,7 @@ export default function LoginPage() {
             <p className="text-slate-500 font-medium">
               Don't have an account?{" "}
               <Link href="/register" className="text-blue-600 font-bold hover:underline">
-                "Create an account"
+                Create an account
               </Link>
             </p>
           </div>
