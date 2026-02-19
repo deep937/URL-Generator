@@ -11,7 +11,9 @@ import {
   Loader2, 
   ArrowLeft,
   Zap,
-  ExternalLink 
+  Grid,
+  ExternalLink,
+  Link as LinkIcon
 } from "lucide-react";
 
 export default function GeneratePage() {
@@ -21,20 +23,24 @@ export default function GeneratePage() {
   const [shortUrl, setShortUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const userStr = localStorage.getItem("user");
     if (!userStr) {
       router.push("/login");
     }
   }, [router]);
 
-  // Generate a random 6-character code
+  if (!mounted) return null;
+
   const generateShortUrl = () => Math.random().toString(36).substring(2, 8);
 
   const handleGenerate = async (e) => {
     e.preventDefault();
-    const user = JSON.parse(localStorage.getItem("user"));
+    const userStr = localStorage.getItem("user");
+    const user = userStr ? JSON.parse(userStr) : null;
 
     if (!user?.id) {
       router.push("/login");
@@ -42,12 +48,10 @@ export default function GeneratePage() {
     }
 
     setLoading(true);
-    // Reset shortUrl so the card hides and re-animates if generating a new one
     setShortUrl(""); 
 
     const code = generateShortUrl();
 
-    // Ensure your table name is "urls" and columns match exactly
     const { error } = await supabase.from("urls").insert({
       long_url: longUrl,
       short_url: code,
@@ -58,11 +62,9 @@ export default function GeneratePage() {
 
     if (error) {
       console.error("DB ERROR:", error.message);
-      alert("Error: " + error.message); // Added for visibility during debugging
     } else {
       setShortUrl(code);
     }
-    
     setLoading(false);
   };
 
@@ -79,94 +81,96 @@ export default function GeneratePage() {
   };
 
   return (
-    // Changed bg color to ensure text contrast and fixed scrolling for long results
-    <div className="min-h-screen bg-[#abc7df] flex flex-col items-center justify-center px-4 py-20 relative overflow-y-auto">
+    <div className="min-h-screen bg-[#abc7df] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
       
-      {/* Background Decor */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-blue-100 blur-[120px]" />
-      </div>
-
-      {/* Top Navigation */}
-      <div className="fixed top-8 left-0 right-0 px-8 flex justify-between items-center max-w-7xl mx-auto w-full z-50">
+      {/* --- TOP NAVIGATION BAR --- */}
+      <div className="absolute top-8 left-8 right-8 flex justify-between items-center pointer-events-none">
         <button 
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all bg-white px-4 py-2.5 rounded-2xl border border-slate-100 shadow-sm"
+          className="pointer-events-auto flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors bg-white/50 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-100"
         >
           <ArrowLeft size={16} /> Back
         </button>
         
         <button 
           onClick={() => router.push("/dashboard")}
-          className="flex items-center gap-2 text-sm font-bold text-slate-900 hover:bg-slate-900 hover:text-white transition-all bg-white px-5 py-2.5 rounded-2xl border border-slate-200 shadow-sm group"
+          className="pointer-events-auto flex items-center gap-2 text-sm font-bold text-blue-600 hover:bg-blue-50 transition-all bg-white shadow-sm px-4 py-2 rounded-xl border border-blue-100"
         >
-          <LayoutDashboard size={16} className="text-blue-600 group-hover:text-white transition-colors" /> 
-          Dashboard
+          <Grid size={16} /> Go to Dashboard
         </button>
       </div>
 
-      <div className="w-full max-w-xl">
-        <div className="relative bg-white border border-slate-200 rounded-[2.5rem] shadow-2xl p-8 md:p-12 space-y-8">
+      <div className="w-full max-w-xl relative">
+        {/* Decorative Glow */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-200/20 blur-[100px] -z-10" />
+
+        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_20px_60px_rgba(0,0,0,0.03)] p-8 md:p-12 space-y-8">
           
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white mx-auto shadow-xl mb-2 rotate-3 transition-transform">
-              <Zap size={32} fill="currentColor" />
+          {/* Header Section matching QR Style */}
+          <div className="text-center space-y-3">
+            <div className="w-16 h-16 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white mx-auto shadow-xl shadow-blue-100 mb-4 animate-float">
+              <Zap size={32} />
             </div>
-            <div>
-              <h1 className="text-3xl font-black text-slate-900 tracking-tight">Generate Short Link</h1>
-              <p className="text-slate-500 font-medium">Turn long URLs into clickable assets.</p>
-            </div>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Shorten URL</h1>
+            <p className="text-slate-500 font-medium italic">Transform any long link into a clean asset</p>
           </div>
 
           <form onSubmit={handleGenerate} className="space-y-4">
-            <input
-              type="url"
-              placeholder="https://example.com/very-long-link"
-              required
-              className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none text-slate-900"
-              value={longUrl}
-              onChange={(e) => {
-                setLongUrl(e.target.value);
-                if (shortUrl) setShortUrl(""); // Clear previous result if user types new URL
-              }}
-            />
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                <LinkIcon size={18} />
+              </div>
+              <input
+                type="url"
+                placeholder="https://example.com/very-long-url"
+                required
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-5 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all outline-none text-slate-900 font-medium"
+                value={longUrl}
+                onChange={(e) => {
+                  setLongUrl(e.target.value);
+                  if (shortUrl) setShortUrl("");
+                }}
+              />
+            </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg hover:bg-blue-600 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+              className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-blue-600 transition-all duration-500 shadow-xl shadow-slate-200 hover:shadow-blue-200 disabled:opacity-70 flex items-center justify-center gap-2 group"
             >
-              {loading ? <Loader2 className="animate-spin" /> : <>Shorten Link <Sparkles size={20} /></>}
+              {loading ? <Loader2 className="animate-spin" /> : <>Generate Link <Sparkles size={18} /></>}
             </button>
           </form>
 
-          {/* RESULT CARD - Ensure this is rendered when shortUrl exists */}
           {shortUrl && (
-            <div className="pt-8 border-t border-slate-100 animate-in fade-in slide-in-from-top-4 duration-500">
-              <div className="bg-slate-900 rounded-3xl p-8 text-white flex flex-col items-center space-y-6 shadow-2xl">
+            <div className="pt-8 border-t border-slate-50 animate-in fade-in zoom-in duration-500">
+              <div className="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-100 flex flex-col items-center space-y-6">
+                
                 <div className="text-center space-y-2 w-full">
-                  <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Success! Your link is ready</p>
-                  <p className="text-xl font-mono font-bold break-all bg-white/5 py-3 px-4 rounded-xl border border-white/10">
-                    {typeof window !== 'undefined' ? window.location.host : ''}/r/{shortUrl}
-                  </p>
+                   <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Shortened Link Ready</p>
+                   <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                     <p className="text-base font-mono font-bold break-all text-slate-800">
+                       {window.location.host}/r/{shortUrl}
+                     </p>
+                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                   <button
                     onClick={copyToClipboard}
-                    className={`flex items-center justify-center gap-2 px-4 py-4 rounded-xl font-bold transition-all ${
-                      copied ? "bg-emerald-500 text-white" : "bg-white/10 hover:bg-white/20 text-white"
+                    className={`flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all active:scale-95 shadow-lg ${
+                      copied ? "bg-emerald-500 text-white shadow-emerald-100" : "bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 shadow-slate-100"
                     }`}
                   >
                     {copied ? <Check size={18} /> : <Copy size={18} />}
-                    {copied ? "Copied" : "Copy"}
+                    {copied ? "Copied" : "Copy Link"}
                   </button>
 
                   <button
                     onClick={handleOpenLink}
-                    className="flex items-center justify-center gap-2 px-4 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-100 transition-all"
+                    className="flex items-center justify-center gap-2 px-6 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg active:scale-95"
                   >
-                    <ExternalLink size={18} /> Visit
+                    <ExternalLink size={18} /> Visit Link
                   </button>
                 </div>
               </div>
@@ -174,6 +178,11 @@ export default function GeneratePage() {
           )}
         </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+      `}</style>
     </div>
   );
 }
